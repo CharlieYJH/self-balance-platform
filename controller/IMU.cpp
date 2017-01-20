@@ -211,9 +211,8 @@ void IMU::updateAccelAngle() {
 }
 
 /*
- * getVelocity()
- * Returns gyroscope angular velocity in deg/s
- * @return: gyroscope angular velocit in deg/s
+ * updateVelocity()
+ * Updates gyroscope angular velocity in deg/s
  */
 void IMU::updateVelocity() {
     // Assign according to direction indicated
