@@ -1,5 +1,4 @@
 #include "XV4001BD.h"
-#include "Servo.h"
 #include "I2Cdev.h"
 #include "MPU6050.h"
 #include "IMU.h"
@@ -12,12 +11,15 @@
 
 //// Create objects
 IMU imu(XV4001BD(53), MPU6050(0x69));
-Servo servo;
+//Servo servo;
 
 // LED and button pins
 const int led_pin = 13;
 const int button_pin = 3;
+const int servo_pin = 23;
 const int read_start = 22;
+const int clock_pin = A13;
+bool clock_signal = false;
 
 bool broadcasted = false;
 
@@ -33,7 +35,13 @@ enum Acceleration {
 void setup() {
     
     // Setup Serial
-    Serial.begin(38400);
+    Serial.begin(57600);
+
+    // Activate rows of pins to communicate data directly to second Arduino
+    for (int i = A2; i < A14; i++) {
+      pinMode(i, OUTPUT);
+      digitalWrite(i, LOW);
+    }
 
     // Configure LED
     pinMode(led_pin, OUTPUT);
@@ -47,13 +55,16 @@ void setup() {
     // Configure jumper pin
     pinMode(read_start, OUTPUT);
     digitalWrite(read_start, LOW);
+
+    pinMode(servo_pin, OUTPUT);
+    digitalWrite(servo_pin, LOW);
   
     // Initialize devices
     bool imu_init = imu.initialize();
-    servo.attach(23);
+//    servo.attach(23);
 
     // Make servo levelled
-    servo.writeMicroseconds(1500);
+//    servo.writeMicroseconds(1500);
   
     // Verify device connection
     Serial.println(imu_init ? "Device connections successful" : "Device connections failed");
@@ -94,21 +105,21 @@ void loop() {
 
     // Low pass filter on output pulse
     pulse = static_cast<int>(alpha * last_pulse + (1 - alpha) * pulse);
-    
-    Serial.print(imu.getAccelAngle(ax)); Serial.print("\t"); Serial.print(imu.getGyroAngle()); Serial.print("\t"); Serial.println(imu.getAngle(ax));
 
-    if (last_pulse == pulse) {
-      // Buffer prevents servo not moving from small movements
-      pulse_buffer++;
-      if (pulse_buffer > 8) servo.detach();
-    } else {
-      // Reset buffer if we have to move servo
-      pulse_buffer = 0;
-      servo.attach(23);
+    int num = pulse;
+
+    // Write binary to pins
+    for (int i = 0; i < 11; i++) {
+      int num_bit = num & 1;
+      num >>= 1;
+      digitalWrite(i + A2, LOW);
+      digitalWrite(i + A2, num_bit);
     }
+
+    // Invert clock pin
+    clock_signal = !clock_signal;
+    digitalWrite(clock_pin, clock_signal);
     
-    // Write to servo
-    servo.writeMicroseconds(pulse);
     last_pulse = pulse;
 }
 
