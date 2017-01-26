@@ -2,6 +2,7 @@
 #include "I2Cdev.h"
 #include "MPU6050.h"
 #include "IMU.h"
+#include "DataCarrier.h"
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -61,10 +62,6 @@ void setup() {
   
     // Initialize devices
     bool imu_init = imu.initialize();
-//    servo.attach(23);
-
-    // Make servo levelled
-//    servo.writeMicroseconds(1500);
   
     // Verify device connection
     Serial.println(imu_init ? "Device connections successful" : "Device connections failed");
@@ -102,9 +99,6 @@ void loop() {
 
     // Determine servo pulse needed from angle
     int pulse = (imu.getAngle(ax)) * 10.8 + 1490;
-
-    // Low pass filter on output pulse
-    pulse = static_cast<int>(alpha * last_pulse + (1 - alpha) * pulse);
 
     int num = pulse;
 
