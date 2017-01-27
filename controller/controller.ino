@@ -12,7 +12,9 @@
 
 //// Create objects
 IMU imu(XV4001BD(53), MPU6050(0x69));
-//Servo servo;
+DataCarrier receiver(1, 2, 1);
+DataCarrier receiver2(1, 2, 1);
+DataCarrier sender(2, 1);
 
 // LED and button pins
 const int led_pin = 13;
@@ -115,5 +117,7 @@ void loop() {
     digitalWrite(clock_pin, clock_signal);
     
     last_pulse = pulse;
+
+    Serial.println(HIGH);
 }
 
