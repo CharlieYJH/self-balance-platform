@@ -2,7 +2,7 @@
 #include "I2Cdev.h"
 #include "MPU6050.h"
 #include "IMU.h"
-#include "DataCarrier.h"
+#include "DataSender.h"
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -12,14 +12,12 @@
 
 //// Create objects
 IMU imu(XV4001BD(53), MPU6050(0x69));
-DataCarrier receiver(1, 2, 1);
-DataCarrier receiver2(1, 2, 1);
-DataCarrier sender(2, 1);
+DataSender sender(A13, A1);
+DataSender sender2(13, 12);
 
 // LED and button pins
 const int led_pin = 13;
 const int button_pin = 3;
-const int servo_pin = 23;
 const int read_start = 22;
 const int clock_pin = A13;
 bool clock_signal = false;
@@ -40,11 +38,8 @@ void setup() {
     // Setup Serial
     Serial.begin(57600);
 
-    // Activate rows of pins to communicate data directly to second Arduino
-    for (int i = A2; i < A14; i++) {
-      pinMode(i, OUTPUT);
-      digitalWrite(i, LOW);
-    }
+    pinMode(12, OUTPUT);
+    digitalWrite(12, HIGH);
 
     // Configure LED
     pinMode(led_pin, OUTPUT);
@@ -58,9 +53,6 @@ void setup() {
     // Configure jumper pin
     pinMode(read_start, OUTPUT);
     digitalWrite(read_start, LOW);
-
-    pinMode(servo_pin, OUTPUT);
-    digitalWrite(servo_pin, LOW);
   
     // Initialize devices
     bool imu_init = imu.initialize();
@@ -102,22 +94,8 @@ void loop() {
     // Determine servo pulse needed from angle
     int pulse = (imu.getAngle(ax)) * 10.8 + 1490;
 
-    int num = pulse;
-
-    // Write binary to pins
-    for (int i = 0; i < 11; i++) {
-      int num_bit = num & 1;
-      num >>= 1;
-      digitalWrite(i + A2, LOW);
-      digitalWrite(i + A2, num_bit);
-    }
-
-    // Invert clock pin
-    clock_signal = !clock_signal;
-    digitalWrite(clock_pin, clock_signal);
+    sender.transmit(pulse);
     
     last_pulse = pulse;
-
-    Serial.println(HIGH);
 }
 

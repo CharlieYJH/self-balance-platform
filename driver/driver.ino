@@ -15,6 +15,9 @@ void setup() {
     pinMode(i, INPUT);
   }
 
+  pinMode(A1, OUTPUT);
+  digitalWrite(A1, HIGH);
+
   // Use analog pin as digital servo pin
   servo.attach(A0);
 
@@ -25,7 +28,7 @@ void setup() {
   clock_bit = digitalRead(clock_pin);
 }
 
-void loop() 
+void loop()  {
 
   // Read binary value from other Arduino if clock bit is inverted since last read
   if (digitalRead(clock_pin) != clock_bit) {
@@ -39,6 +42,8 @@ void loop()
       pulse |= digitalRead(i + 2);
       if (i < 10) pulse <<= 1;
     }
+
+    Serial.println(pulse);
 
     // Change servo drive pulse
     servo.writeMicroseconds(pulse);
