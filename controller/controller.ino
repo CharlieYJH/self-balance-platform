@@ -12,8 +12,7 @@
 
 //// Create objects
 IMU imu(XV4001BD(53), MPU6050(0x69));
-DataSender sender(A13, A1);
-DataSender sender2(13, 12);
+DataSender sender(A0, A1);
 
 // LED and button pins
 const int led_pin = 13;
@@ -36,10 +35,7 @@ enum Acceleration {
 void setup() {
     
     // Setup Serial
-    Serial.begin(57600);
-
-    pinMode(12, OUTPUT);
-    digitalWrite(12, HIGH);
+    Serial.begin(9600);
 
     // Configure LED
     pinMode(led_pin, OUTPUT);
@@ -92,7 +88,7 @@ void loop() {
     }
 
     // Determine servo pulse needed from angle
-    int pulse = (imu.getAngle(ax)) * 10.8 + 1490;
+    int pulse = imu.getAngle(ax) * 10.8;
 
     sender.transmit(pulse);
     
