@@ -47,6 +47,7 @@ void DataSender::transmit(int data) {
 
 		// Don't transmit if an active ACK pin is busy
 		if (m_receivers[i].active && !digitalRead(m_receivers[i].pin)) {
+			
 			return;
 		}
 	}

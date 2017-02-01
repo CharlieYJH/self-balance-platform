@@ -9,11 +9,6 @@ void setup() {
   // Begin serial communication
   Serial.begin(9600);
 
-  // Set all communication pins as input
-  for (int i = 2; i < 13; i++) {
-    pinMode(i, INPUT);
-  }
-
   // Use analog pin as digital servo pin
   servo.attach(A0);
 
@@ -27,5 +22,5 @@ void loop()  {
     int pulse = receiver.getData();
 
     // Change servo drive pulse
-    servo.writeMicroseconds(pulse + 1490);
+    servo.writeMicroseconds(pulse + 1500);
 }

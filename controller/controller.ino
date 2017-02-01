@@ -16,17 +16,9 @@ DataSender sender(A0, A1);
 
 // LED and button pins
 const int led_pin = 13;
-const int button_pin = 3;
 const int read_start = 22;
-const int clock_pin = A13;
-bool clock_signal = false;
 
 bool broadcasted = false;
-
-// Variables to smooth out servo movements and hold position
-int last_pulse;
-int pulse_buffer = 0;
-int alpha = 0.6;
 
 enum Acceleration {
   ax, ay, az
@@ -40,15 +32,9 @@ void setup() {
     // Configure LED
     pinMode(led_pin, OUTPUT);
     digitalWrite(led_pin, LOW);
-    
-    // Configure button
-    pinMode(button_pin, OUTPUT);
-    // Use internal pullup for button
-    digitalWrite(button_pin, HIGH);
 
     // Configure jumper pin
-    pinMode(read_start, OUTPUT);
-    digitalWrite(read_start, LOW);
+    pinMode(read_start, INPUT);
   
     // Initialize devices
     bool imu_init = imu.initialize();
@@ -57,10 +43,10 @@ void setup() {
     Serial.println(imu_init ? "Device connections successful" : "Device connections failed");
   
     // Set accelerometer offsets
-    imu.setAccelerometerOffsets(-1616, -174, 1060);
+    imu.setAccelerometerOffsets(-1588, -158, 1036);
 
     // Set IMU constants
-    imu.setCompFilterConstant(0.995);
+    imu.setCompFilterConstant(0.998);
     imu.setAccelFilterConstant(1);
 
     // Reverse x axis of accelerometer
@@ -82,16 +68,13 @@ void loop() {
     // Update IMU reading
     imu.update();
 
-    if (!broadcasted) {
-      digitalWrite(read_start, HIGH);
-      broadcasted = true;
-    }
-
     // Determine servo pulse needed from angle
     int pulse = imu.getAngle(ax) * 10.8;
 
     sender.transmit(pulse);
-    
-    last_pulse = pulse;
+
+    if (digitalRead(read_start)) {
+      Serial.print(millis()); Serial.print("\t"); Serial.print(imu.getVelocity()); Serial.print("\t"); Serial.println(imu.getAngle(ax));
+    }
 }
 
