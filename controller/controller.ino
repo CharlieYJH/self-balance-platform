@@ -68,10 +68,15 @@ void loop() {
     // Update IMU reading
     imu.update();
 
-    int angle = -1.35 * imu.getAngle(ax);
+    float angle = imu.getAngle(ax);
+
+    // Bound angle within +/-32 degrees
+    angle = (angle > 32) ? 32
+                         : (angle < -32) ? -32
+                                         : angle;
 
     // Determine servo pulse needed from angle
-    int pulse = angle * 10.8;
+    int pulse = -1.35 * angle * 10.8;
 
     sender.transmit(pulse);
 
