@@ -163,8 +163,8 @@ void IMU::update() {
 
     // Update gyroscope angle and fused angle
     m_gyro_angle += m_gyro_data * dt;
-    m_filtered_angle[ax] = m_output_alpha * (m_filtered_angle[ax] + m_gyro_data * dt) + (1 - m_output_alpha) * m_accel_angle[ax];
-    m_filtered_angle[ay] = m_output_alpha * (m_filtered_angle[ay] + m_gyro_data * dt) + (1 - m_output_alpha) * m_accel_angle[ay];
+    m_filtered_angle[ax] = m_output_alpha * (m_filtered_angle[ax] + (1.145 * m_gyro_data * dt)) + (1 - m_output_alpha) * m_accel_angle[ax];
+    m_filtered_angle[ay] = m_output_alpha * (m_filtered_angle[ay] + (1.145 * m_gyro_data * dt)) + (1 - m_output_alpha) * m_accel_angle[ay];
 }
 
 /*

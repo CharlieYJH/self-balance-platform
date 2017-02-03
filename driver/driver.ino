@@ -22,5 +22,5 @@ void loop()  {
     int pulse = receiver.getData();
 
     // Change servo drive pulse
-    servo.writeMicroseconds(pulse + 1500);
+    servo.writeMicroseconds(pulse + 1485);
 }
