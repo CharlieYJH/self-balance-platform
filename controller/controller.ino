@@ -46,7 +46,7 @@ void setup() {
     imu.setAccelerometerOffsets(-1588, -158, 1036);
 
     // Set IMU constants
-    imu.setCompFilterConstant(0.97);
+    imu.setCompFilterConstant(0.90);
     imu.setAccelFilterConstant(1);
 
     // Reverse x axis of accelerometer
@@ -76,12 +76,12 @@ void loop() {
                                          : angle;
 
     // Determine servo pulse needed from angle
-    int pulse = -1.35 * angle * 10.8;
+    int pulse = -1.39 * angle * 10.8;
 
     sender.transmit(pulse);
 
     if (digitalRead(read_start)) {
-      Serial.print(millis()); Serial.print("\t"); Serial.print(imu.getVelocity()); Serial.print("\t"); Serial.println(imu.getAngle(ax));
+      Serial.print(millis()); Serial.print("\t"); Serial.print(imu.getVelocity()); Serial.print("\t"); Serial.println(-imu.getAngle(ax));
     }
 }
 
