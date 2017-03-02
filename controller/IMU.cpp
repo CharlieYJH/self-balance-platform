@@ -163,8 +163,8 @@ void IMU::update() {
 
     // Update gyroscope angle and fused angle
     m_gyro_angle += m_gyro_data * dt;
-    m_filtered_angle[ax] = m_output_alpha * (m_filtered_angle[ax] + (1.4 * m_gyro_data * dt)) + (1 - m_output_alpha) * m_accel_angle[ax];
-    m_filtered_angle[ay] = m_output_alpha * (m_filtered_angle[ay] + (1.4 * m_gyro_data * dt)) + (1 - m_output_alpha) * m_accel_angle[ay];
+    m_filtered_angle[x] = m_output_alpha * (m_filtered_angle[x] + (1.4 * m_gyro_data * dt)) + (1 - m_output_alpha) * m_accel_angle[x];
+    m_filtered_angle[y] = m_output_alpha * (m_filtered_angle[y] + (1.4 * m_gyro_data * dt)) + (1 - m_output_alpha) * m_accel_angle[y];
 }
 
 /*
@@ -177,7 +177,7 @@ void IMU::updateAcceleration() {
     int16_t raw_data[3];
 
     // Get accelerometer data
-    m_accel.getAcceleration(&raw_data[ax], &raw_data[ay], &raw_data[az]);
+    m_accel.getAcceleration(&raw_data[x], &raw_data[y], &raw_data[z]);
 
     // Filter the data to remove high frequency noise
     for (int i = 0; i < 3; i++) {
@@ -195,19 +195,19 @@ void IMU::updateAccelAngle() {
     IMU::updateAcceleration();
 
     // Convert to g units
-    float accel_x = m_accel_data[ax] / 16384.0;
-    float accel_y = m_accel_data[ay] / 16384.0;
-    float accel_z = m_accel_data[az] / 16384.0;
+    float accel_x = m_accel_data[x] / 16384.0;
+    float accel_y = m_accel_data[y] / 16384.0;
+    float accel_z = m_accel_data[z] / 16384.0;
 
     float angle_ratio = 180 / 3.14159;
 
     // Get angle values
-    m_accel_angle[ax] = atan(accel_x / sqrt(accel_y * accel_y + accel_z * accel_z)) * angle_ratio;
-    m_accel_angle[ay] = atan(accel_y / sqrt(accel_x * accel_x + accel_z * accel_z)) * angle_ratio;
+    m_accel_angle[x] = atan(accel_x / sqrt(accel_y * accel_y + accel_z * accel_z)) * angle_ratio;
+    m_accel_angle[y] = atan(accel_y / sqrt(accel_x * accel_x + accel_z * accel_z)) * angle_ratio;
 
     // Reverse directions if necessary
-    if (m_x_accel_reverse) m_accel_angle[ax] = - m_accel_angle[ax];
-    if (m_y_accel_reverse) m_accel_angle[ay] = - m_accel_angle[ay];
+    if (m_x_accel_reverse) m_accel_angle[x] = - m_accel_angle[x];
+    if (m_y_accel_reverse) m_accel_angle[y] = - m_accel_angle[y];
 }
 
 /*

@@ -129,9 +129,10 @@ private:
 	MPU6050 m_accel;
 
 	// Enum for acceleration axes
-	enum Acceleration {
-		ax, ay, az
+	enum Axis {
+		x, y, z
 	};
+
 	// Gyro and accelerometer data containers
 	int16_t m_accel_data[3];
 	float m_gyro_data;

@@ -46,10 +46,7 @@ void DataSender::transmit(int data) {
 	for (int i = 0; i < kMaxReceivers; i++) {
 
 		// Don't transmit if an active ACK pin is busy
-		if (m_receivers[i].active && !digitalRead(m_receivers[i].pin)) {
-			
-			return;
-		}
+		if (m_receivers[i].active && !digitalRead(m_receivers[i].pin)) return;
 	}
 
 	// Send data through data pins by bit banging
