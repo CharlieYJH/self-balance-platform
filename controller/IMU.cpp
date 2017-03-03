@@ -7,12 +7,12 @@
  * @param[accel]: accelerometer object
  */
 IMU::IMU(XV4001BD gyro, MPU6050 accel) 
-    : m_gyro(gyro),
+    : m_gyro{gyro, gyro},
       m_accel(accel),
-      m_gyro_reverse(false),
+      m_x_gyro_reverse(false),
+      m_y_gyro_reverse(false),
       m_x_accel_reverse(false),
       m_y_accel_reverse(false),
-      m_gyro_angle(0),
       m_output_alpha(0.95),
       m_accel_alpha(1),
       m_last(0) {};
@@ -34,8 +34,9 @@ bool IMU::initialize() {
 bool IMU::initializeGyro() {
 
 	// Initialize gyroscope and return connection test result
-	m_gyro.initialize();
-	return m_gyro.testConnection();
+	m_gyro.x.initialize();
+    m_gyro.y.initialize();
+	return m_gyro.x.testConnection() && m_gyro.y.testConnection();
 }
 
 /*
@@ -65,7 +66,7 @@ void IMU::calibrate() {
 
     const int sample_size = 1024;
     const int garbage_size = 100;
-    float gyro_data = 0;
+    float gyro_data[2] = {0};
 
     // Calculate gyro bias based on 1024 samples of gyro data
     for (int i = 0; i < sample_size + garbage_size; i++) {
@@ -77,11 +78,13 @@ void IMU::calibrate() {
         if (i < garbage_size) continue;
 
         // Sum up gyro data
-        gyro_data += m_gyro_data;
+        gyro_data[x] += m_gyro_data[x];
+        gyro_data[y] += m_gyro_data[y];
     }
 
     // Return average bias value
-    m_gyro_bias = gyro_data / sample_size;
+    m_gyro_bias[x] = gyro_data[x] / sample_size;
+    m_gyro_bias[y] = gyro_data[y] / sample_size;
 }
 
 /*
@@ -128,11 +131,13 @@ void IMU::setReverseAccel(bool x_dir, bool y_dir) {
 
 /*
  * setReverseGyro()
- * @param[direction]: gyroscope direction (true: backward, false: forward)
  * Reverses gyroscope direction
+ * @param[x_dir]: gyroscope direction in x (true: backward, false: forward)
+ * @param[y_dir]: gyroscope direction in y (true: backward, false: forward)
  */
-void IMU::setReverseGyro(bool direction) {
-    m_gyro_reverse = direction;
+void IMU::setReverseGyro(bool x_dir, bool y_dir) {
+    m_x_gyro_reverse = x_dir;
+    m_y_gyro_reverse = y_dir;
 }
 
 /*
@@ -143,18 +148,18 @@ void IMU::update() {
 
     // Initiate |m_last| on initial call
     if (!m_last) {
-        m_last = millis();
+        m_last = micros();
         return;
     }
 
     // Record current time
-    int now = millis();
+    int now = micros();
 
     // Make sure time difference will be greater than 1ms
     if (now - m_last < 2) return;
 
     // Get time difference since last call
-    float dt = (now - m_last) / 1000.0;
+    float dt = (now - m_last) / 1000000.0;
     m_last = now;
 
     // Update gyroscope velocity and accelerometer angle
@@ -162,9 +167,10 @@ void IMU::update() {
     IMU::updateAccelAngle();
 
     // Update gyroscope angle and fused angle
-    m_gyro_angle += m_gyro_data * dt;
-    m_filtered_angle[x] = m_output_alpha * (m_filtered_angle[x] + (1.4 * m_gyro_data * dt)) + (1 - m_output_alpha) * m_accel_angle[x];
-    m_filtered_angle[y] = m_output_alpha * (m_filtered_angle[y] + (1.4 * m_gyro_data * dt)) + (1 - m_output_alpha) * m_accel_angle[y];
+    m_gyro_angle[x] += m_gyro_data[x] * dt;
+    m_gyro_angle[y] += m_gyro_data[y] * dt;
+    m_filtered_angle[x] = m_output_alpha * (m_filtered_angle[x] + (1.4 * m_gyro_data[x] * dt)) + (1 - m_output_alpha) * m_accel_angle[x];
+    m_filtered_angle[y] = m_output_alpha * (m_filtered_angle[y] + (1.4 * m_gyro_data[y] * dt)) + (1 - m_output_alpha) * m_accel_angle[y];
 }
 
 /*
@@ -215,9 +221,13 @@ void IMU::updateAccelAngle() {
  * Updates gyroscope angular velocity in deg/s
  */
 void IMU::updateVelocity() {
+    
     // Assign according to direction indicated
-    m_gyro_data = (m_gyro_reverse) ? - m_gyro.getAngularRate() - m_gyro_bias
-                                   : m_gyro.getAngularRate() - m_gyro_bias;
+    m_gyro_data[x] = (m_x_gyro_reverse) ? - m_gyro.x.getAngularRate() - m_gyro_bias[x]
+                                        : m_gyro.x.getAngularRate() - m_gyro_bias[x];
+
+    m_gyro_data[y] = (m_y_gyro_reverse) ? - m_gyro.y.getAngularRate() - m_gyro_bias[y]
+                                        : m_gyro.y.getAngularRate() - m_gyro_bias[y];
 }
 
 /*
@@ -233,16 +243,17 @@ float IMU::getAcceleration(int axis) const {
 /*
  * getVelocity()
  * Returns gyroscope angular velocity in deg/s
+ * @param[axis]: Specified axis (1:x, 2:y)
  * @return: gyroscope angular velocit in deg/s
  */
-float IMU::getVelocity() const {
-    return m_gyro_data;
+float IMU::getVelocity(int axis) const {
+    return m_gyro_data[axis];
 }
 
 /*
  * getAccelAngle()
  * Returns accelerometer angle in degrees
- * @param[axis]: the axis to return (1:x, 1:y)
+ * @param[axis]: the axis to return (1:x, 2:y)
  * @return: accelerometer angle in degrees
  */
 float IMU::getAccelAngle(int axis) const {
@@ -252,10 +263,11 @@ float IMU::getAccelAngle(int axis) const {
 /*
  * getGyroAngle()
  * Returns gyroscope angle in degrees
+ * @param[axis]: Specified axis (1:x, 2:y)
  * @return: gyroscope angle in degrees
  */
-float IMU::getGyroAngle() const {
-    return m_gyro_angle;
+float IMU::getGyroAngle(int axis) const {
+    return m_gyro_angle[axis];
 }
 
 /*

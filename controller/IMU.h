@@ -73,10 +73,11 @@ public:
 
 	/*
 	 * reverseGyro()
-	 * @param[direction]: gyroscope direction (false: forward, true: backward)
 	 * Reverses gyroscope direction
+	 * @param[x_dir]: gyroscope direction in x (false: forward, true: backward)
+	 * @param[y_dir]: gyroscope direction in y (false: forward, true: backward)
 	 */
-	void setReverseGyro(bool direction);
+	void setReverseGyro(bool x_dir, bool y_dir);
 
 	/*
 	 * update()
@@ -95,9 +96,10 @@ public:
 	/*
 	 * getVelocity()
 	 * Returns gyroscope angular velocity in deg/s
+	 * @param[axis]: Specified axis (1:x, 2:y)
 	 * @return: gyroscope angular velocit in deg/s
 	 */
-	float getVelocity() const;
+	float getVelocity(int axis) const;
 
 	/*
 	 * getAccelAngle()
@@ -110,9 +112,10 @@ public:
 	/*
 	 * getGyroAngle()
 	 * Returns gyroscope angle in degrees
+	 * @param[axis]: Specified axis (1:x, 2:y)
 	 * @return: gyroscope angle in degrees
 	 */
-	float getGyroAngle() const;
+	float getGyroAngle(int axis) const;
 
 	/*
 	 * getAngle()
@@ -124,25 +127,31 @@ public:
 
 private:
 
-	// Gyro and accelerometer objects
-	XV4001BD m_gyro;
-	MPU6050 m_accel;
-
 	// Enum for acceleration axes
 	enum Axis {
 		x, y, z
 	};
 
+	// Struct for two axis gyroscope reading
+	struct Gyroscope {
+		XV4001BD x;
+		XV4001BD y;
+	};
+
+	// Gyro and accelerometer objects
+	Gyroscope m_gyro;
+	MPU6050 m_accel;
+
 	// Gyro and accelerometer data containers
 	int16_t m_accel_data[3];
-	float m_gyro_data;
+	float m_gyro_data[2];
 
 	// Gyro data bias
-	float m_gyro_bias;
+	float m_gyro_bias[2];
 
 	// Angle containers
 	float m_accel_angle[2];
-	float m_gyro_angle;
+	float m_gyro_angle[2];
 	float m_filtered_angle[2];
 
 	// Complementary filter constant
@@ -157,7 +166,8 @@ private:
 	// Accelerometer and gyroscope directions
 	bool m_x_accel_reverse;
 	bool m_y_accel_reverse;
-	bool m_gyro_reverse;
+	bool m_x_gyro_reverse;
+	bool m_y_gyro_reverse;
 
 	/*
 	 * initializeGyro()

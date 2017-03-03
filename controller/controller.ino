@@ -51,7 +51,7 @@ void setup() {
 
     // Reverse x axis of accelerometer
     imu.setReverseAccel(true, false);
-    imu.setReverseGyro(true);
+    imu.setReverseGyro(false, false);
 
     // IMU sensor bias calibration
     imu.calibrate();
@@ -80,8 +80,9 @@ void loop() {
 
     sender.transmit(pulse);
 
-    if (digitalRead(read_start)) {
-      Serial.print(millis()); Serial.print("\t"); Serial.print(imu.getVelocity()); Serial.print("\t"); Serial.println(-imu.getAngle(ax));
+    if (!digitalRead(read_start)) {
+      //Serial.print(millis()); Serial.print("\t"); Serial.print(imu.getVelocity(ax)); Serial.print("\t"); Serial.print(imu.getVelocity(ay)); Serial.print("\t"); Serial.println(-imu.getAngle(ax));
     }
+    Serial.println(imu.getVelocity(ax));
 }
 
