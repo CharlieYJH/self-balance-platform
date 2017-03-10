@@ -23,10 +23,11 @@ public:
 	/*
 	 * IMU()
 	 * Constructor
-	 * @param[gyro]: gyroscope object
+	 * @param[gyro_x]: gyroscope object for the x-axis
+	 * @param[gyro_y]: gyroscope object for the y-axis
 	 * @param[accel]: accelerometer object
 	 */
-	IMU(XV4001BD gyro, MPU6050 accel);
+	IMU(XV4001BD gyro_x, XV4001BD gyro_y, MPU6050 accel);
 
 	/*
 	 * initialize()

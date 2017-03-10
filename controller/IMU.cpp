@@ -4,10 +4,11 @@
  * IMU()
  * Constructor
  * @param[gyro]: gyroscope object
+ * @param[gyro_y]: gyroscope object for the y-axis
  * @param[accel]: accelerometer object
  */
-IMU::IMU(XV4001BD gyro, MPU6050 accel) 
-    : m_gyro{gyro, gyro},
+IMU::IMU(XV4001BD gyro_x, XV4001BD gyro_y, MPU6050 accel) 
+    : m_gyro{gyro_x, gyro_y},
       m_accel(accel),
       m_x_gyro_reverse(false),
       m_y_gyro_reverse(false),

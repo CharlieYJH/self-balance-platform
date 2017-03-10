@@ -11,7 +11,7 @@
 #endif
 
 //// Create objects
-IMU imu(XV4001BD(53), MPU6050(0x69));
+IMU imu(XV4001BD(11), XV4001BD(10), MPU6050(0x68));
 DataSender sender(A0, A1);
 
 // LED and button pins
@@ -43,7 +43,7 @@ void setup() {
     Serial.println(imu_init ? "Device connections successful" : "Device connections failed");
   
     // Set accelerometer offsets
-    imu.setAccelerometerOffsets(-1588, -158, 1036);
+    imu.setAccelerometerOffsets(-268, 1260, 2626);
 
     // Set IMU constants
     imu.setCompFilterConstant(0.90);
@@ -83,6 +83,6 @@ void loop() {
     if (!digitalRead(read_start)) {
       //Serial.print(millis()); Serial.print("\t"); Serial.print(imu.getVelocity(ax)); Serial.print("\t"); Serial.print(imu.getVelocity(ay)); Serial.print("\t"); Serial.println(-imu.getAngle(ax));
     }
-    Serial.println(imu.getVelocity(ax));
+    Serial.print(imu.getAcceleration(ax)); Serial.print("\t"); Serial.print(imu.getAcceleration(ay)); Serial.print("\t"); Serial.print(imu.getAcceleration(az)); Serial.print("\t"); Serial.print(imu.getVelocity(ax)); Serial.print("\t"); Serial.println(imu.getVelocity(ay));
 }
 
