@@ -12,6 +12,7 @@ int DataSender::ACK_count = 0;
 DataSender::DataSender(int clk, int ack)
 	: m_clk(clk),
 	  m_clk_bit(false),
+	  m_ack_bit(false),
 	  m_ack(ack)
 {
 	if (ACK_count < kMaxReceivers) {
@@ -43,12 +44,6 @@ DataSender::DataSender(int clk, int ack)
  */
 void DataSender::transmit(int data) {
 
-	for (int i = 0; i < kMaxReceivers; i++) {
-
-		// Don't transmit if an active ACK pin is busy
-		if (m_receivers[i].active && !digitalRead(m_receivers[i].pin)) return;
-	}
-
 	// Send data through data pins by bit banging
 	for (int i = 0; i < kDataLength; i++) {
 
@@ -61,4 +56,10 @@ void DataSender::transmit(int data) {
 	// Switch the clock signal to notify receiver
 	m_clk_bit = !m_clk_bit;
 	digitalWrite(m_clk, m_clk_bit);
+
+	while (digitalRead(m_ack) == m_ack_bit) {
+		// Serial.print("Waiting");
+	}
+
+	m_ack_bit = !m_ack_bit;
 }

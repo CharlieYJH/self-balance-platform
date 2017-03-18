@@ -1,8 +1,16 @@
 #include <Servo.h>
 #include "DataReceiver.h"
 
+struct DataReceivers {
+	DataReceiver x;
+	DataReceiver y;
+};
+
 Servo servo;
-DataReceiver receiver(13, A1);
+DataReceivers receiver {
+	DataReceiver(13, A3),
+	DataReceiver(0, A4)
+};
 
 void setup() {
 
@@ -18,9 +26,13 @@ void setup() {
 
 void loop()  {
 
-    receiver.read();
-    int pulse = receiver.getData();
+    receiver.x.read();
+	receiver.y.read();
+    int pulse1 = receiver.x.getData();
+	int pulse2 = receiver.y.getData();
 
     // Change servo drive pulse
-    servo.writeMicroseconds(pulse + 1485);
+    // servo.writeMicroseconds(pulse1 + 1485);
+	Serial.print(pulse1); Serial.print("\t");
+	Serial.println(pulse2);
 }

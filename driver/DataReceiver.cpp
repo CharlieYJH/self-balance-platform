@@ -3,12 +3,14 @@
 DataReceiver::DataReceiver(int clk, int ack)
 	: m_clk(clk),
 	  m_ack(ack),
+	  m_clk_bit(false),
+	  m_ack_bit(false),
 	  m_data(0)
 {
 	// Set Arduino pin modes
 	pinMode(m_clk, INPUT);
 	pinMode(m_ack, OUTPUT);
-	digitalWrite(m_ack, HIGH);
+	digitalWrite(m_ack, LOW);
 
 	for (int i = 0; i < kDataLength; i++) {
 		pinMode(kDataPin[i], INPUT);
@@ -23,13 +25,17 @@ DataReceiver::DataReceiver(int clk, int ack)
  */
 void DataReceiver::read() {
 
+	Serial.println(m_clk_bit);
+
 	// Read from data pins if clock changed edge
 	if (digitalRead(m_clk) != m_clk_bit) {
 
-		m_clk_bit = !m_clk_bit;
+		m_clk_bit = digitalRead(m_clk);
 
-		// Pull ACK signal low
-		digitalWrite(m_ack, LOW);
+		delayMicroseconds(100);
+
+		// // Pull ACK signal low
+		// digitalWrite(m_ack, LOW);
 
 		int data = 0;
 
@@ -51,7 +57,9 @@ void DataReceiver::read() {
 		m_data = data;
 
 		// Pull ACK back high
-		digitalWrite(m_ack, HIGH);
+		// Alternate ACK bit
+		m_ack_bit = !m_ack_bit;
+		digitalWrite(m_ack, m_clk_bit);
 	}
 }
 

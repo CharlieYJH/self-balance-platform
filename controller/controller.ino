@@ -10,9 +10,17 @@
     #include "Wire.h"
 #endif
 
-//// Create objects
+struct DataSenders {
+	DataSender x;
+	DataSender y;
+};
+
+// Create objects
 IMU imu(XV4001BD(11), XV4001BD(10), MPU6050(0x68));
-DataSender sender(A0, A1);
+DataSenders sender {
+	DataSender(A11, A14),
+	DataSender(A12, A13)
+};
 
 // LED and button pins
 const int led_pin = 13;
@@ -68,17 +76,28 @@ void loop() {
     // Update IMU reading
     imu.update();
 
-    float angle = imu.getAngle(ax);
+	// Read angles from sensors
+    float angle_x = imu.getAngle(ax);
+	float angle_y = imu.getAngle(ay);
 
     // Bound angle within +/-32 degrees
-    angle = (angle > 32) ? 32
-                         : (angle < -32) ? -32
-                                         : angle;
+    angle_x = (angle_x > 32) ? 32
+                         : (angle_x < -32) ? -32
+                         				   : angle_x;
+
+    angle_y = (angle_y > 32) ? 32
+                         : (angle_y < -32) ? -32
+                         				   : angle_y;
 
     // Determine servo pulse needed from angle
-    int pulse = -1.39 * angle * 10.8;
+    int pulse_x = -1.39 * angle_x * 10.8;
+	int pulse_y = -1.39 * angle_y * 10.8;
 
-    sender.transmit(pulse);
+    // sender.x.transmit(pulse_x);
+	// sender.y.transmit(pulse_y);
+
+	sender.x.transmit((int)random(-400, 400));
+	sender.y.transmit((int)random(-400, 400));
 
     if (!digitalRead(read_start)) {
       //Serial.print(millis()); Serial.print("\t"); Serial.print(imu.getVelocity(ax)); Serial.print("\t"); Serial.print(imu.getVelocity(ay)); Serial.print("\t"); Serial.println(-imu.getAngle(ax));

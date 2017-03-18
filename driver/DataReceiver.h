@@ -31,7 +31,8 @@ public:
 private:
 
 	int m_clk;
-	bool m_clk_bit;
+	int m_clk_bit;
+	int m_ack_bit;
 	int m_ack;
 	int m_data;
 
