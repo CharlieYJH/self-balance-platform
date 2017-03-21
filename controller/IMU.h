@@ -164,6 +164,9 @@ private:
 	// Last execution time
 	int m_last;
 
+	// Records how many gyro samples are stationary
+	int m_stationary_count[2];
+
 	// Accelerometer and gyroscope directions
 	bool m_x_accel_reverse;
 	bool m_y_accel_reverse;

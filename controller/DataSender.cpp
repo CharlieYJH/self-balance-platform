@@ -57,9 +57,11 @@ void DataSender::transmit(int data) {
 	m_clk_bit = !m_clk_bit;
 	digitalWrite(m_clk, m_clk_bit);
 
+	// Wait until receiver flips ACK to ensure delivery
 	while (digitalRead(m_ack) == m_ack_bit) {
 		// Serial.print("Waiting");
 	}
-
+	
+	// Flip internal ACK bit
 	m_ack_bit = !m_ack_bit;
 }

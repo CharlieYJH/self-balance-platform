@@ -35,4 +35,5 @@ void loop()  {
     // servo.writeMicroseconds(pulse1 + 1485);
 	Serial.print(pulse1); Serial.print("\t");
 	Serial.println(pulse2);
+	servo.writeMicroseconds(pulse1 + 1485);
 }

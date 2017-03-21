@@ -156,8 +156,14 @@ void IMU::update() {
     // Record current time
     int now = micros();
 
-    // Make sure time difference will be greater than 1ms
+    // Make sure time difference will be greater than 2us
     if (now - m_last < 2) return;
+
+	// micros() overflow protection
+	if (now - m_last < 0) {
+		m_last = now;
+		return;
+	}
 
     // Get time difference since last call
     float dt = (now - m_last) / 1000000.0;
@@ -167,11 +173,27 @@ void IMU::update() {
     IMU::updateVelocity();
     IMU::updateAccelAngle();
 
+	// Count how many samples of velocity are less than a threshold
+	// Reset if velocity is greather than this threshold
+	m_stationary_count[x] = (m_gyro_data[x] < 1 && m_gyro_data[x] > -1) ? m_stationary_count[x] + 1
+																		: 0;
+
+	m_stationary_count[y] = (m_gyro_data[y] < 1 && m_gyro_data[y] > -1) ? m_stationary_count[y] + 1
+																		: 0;
+
+	// Set alpha value according to how many velocity samples were stationary
+	float alpha_x = (m_stationary_count[x] > 50) ? 0.99 : m_output_alpha;
+	float alpha_y = (m_stationary_count[y] > 50) ? 0.99 : m_output_alpha;
+
     // Update gyroscope angle and fused angle
     m_gyro_angle[x] += m_gyro_data[x] * dt;
     m_gyro_angle[y] += m_gyro_data[y] * dt;
-    m_filtered_angle[x] = m_output_alpha * (m_filtered_angle[x] + (1.4 * m_gyro_data[x] * dt)) + (1 - m_output_alpha) * m_accel_angle[x];
-    m_filtered_angle[y] = m_output_alpha * (m_filtered_angle[y] + (1.4 * m_gyro_data[y] * dt)) + (1 - m_output_alpha) * m_accel_angle[y];
+
+	// m_filtered_angle[x] = m_output_alpha * (m_filtered_angle[x] + (1.4 * m_gyro_data[x] * dt)) + (1 - m_output_alpha) * m_accel_angle[x];
+	// m_filtered_angle[y] = m_output_alpha * (m_filtered_angle[y] + (1.4 * m_gyro_data[y] * dt)) + (1 - m_output_alpha) * m_accel_angle[y];
+
+	m_filtered_angle[x] = alpha_x * (m_filtered_angle[x] + (1.4 * m_gyro_data[x] * dt)) + (1 - alpha_x) * m_accel_angle[x];
+	m_filtered_angle[y] = alpha_y * (m_filtered_angle[y] + (1.4 * m_gyro_data[y] * dt)) + (1 - alpha_y) * m_accel_angle[y];
 }
 
 /*
