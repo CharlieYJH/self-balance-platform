@@ -175,15 +175,17 @@ void IMU::update() {
 
 	// Count how many samples of velocity are less than a threshold
 	// Reset if velocity is greather than this threshold
-	m_stationary_count[x] = (m_gyro_data[x] < 1 && m_gyro_data[x] > -1) ? m_stationary_count[x] + 1
+	m_stationary_count[x] = (m_gyro_data[x] < 2 && m_gyro_data[x] > -2) ? m_stationary_count[x] + 1
 																		: 0;
 
-	m_stationary_count[y] = (m_gyro_data[y] < 1 && m_gyro_data[y] > -1) ? m_stationary_count[y] + 1
+	m_stationary_count[y] = (m_gyro_data[y] < 2 && m_gyro_data[y] > -2) ? m_stationary_count[y] + 1
 																		: 0;
 
 	// Set alpha value according to how many velocity samples were stationary
-	float alpha_x = (m_stationary_count[x] > 50) ? 0.99 : m_output_alpha;
-	float alpha_y = (m_stationary_count[y] > 50) ? 0.99 : m_output_alpha;
+	float alpha_x = (m_stationary_count[x] > 100) ? 0.995 : m_output_alpha;
+	float alpha_y = (m_stationary_count[y] > 100) ? 0.995 : m_output_alpha;
+
+	Serial.print(alpha_y); Serial.print("\t");
 
     // Update gyroscope angle and fused angle
     m_gyro_angle[x] += m_gyro_data[x] * dt;

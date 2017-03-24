@@ -6,10 +6,19 @@ struct DataReceivers {
 	DataReceiver y;
 };
 
-Servo servo;
+struct Servos {
+	Servo x;
+	Servo y;
+};
+
 DataReceivers receiver {
 	DataReceiver(13, A3),
 	DataReceiver(0, A4)
+};
+
+Servos servo {
+	Servo(),
+	Servo()
 };
 
 void setup() {
@@ -18,7 +27,8 @@ void setup() {
   Serial.begin(9600);
 
   // Use analog pin as digital servo pin
-  servo.attach(A0);
+  servo.x.attach(A0);
+  servo.y.attach(A1);
 
   // Wait for master to settle
   delay(3000);
@@ -28,12 +38,12 @@ void loop()  {
 
     receiver.x.read();
 	receiver.y.read();
-    int pulse1 = receiver.x.getData();
-	int pulse2 = receiver.y.getData();
+    int pulse_x = receiver.x.getData();
+	int pulse_y = receiver.y.getData();
 
     // Change servo drive pulse
-    // servo.writeMicroseconds(pulse1 + 1485);
-	Serial.print(pulse1); Serial.print("\t");
-	Serial.println(pulse2);
-	servo.writeMicroseconds(pulse1 + 1485);
+	// Serial.print(pulse1); Serial.print("\t");
+	// Serial.println(pulse2);
+	servo.x.writeMicroseconds(pulse_x + 1440);
+	servo.y.writeMicroseconds(pulse_y + 1460);
 }

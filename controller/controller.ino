@@ -23,7 +23,8 @@ DataSenders sender {
 };
 
 // LED and button pins
-const int led_pin = 13;
+const int calibrate_pin = 24;
+const int start_pin = 25;
 const int read_start = 22;
 
 bool broadcasted = false;
@@ -38,8 +39,10 @@ void setup() {
     Serial.begin(9600);
 
     // Configure LED
-    pinMode(led_pin, OUTPUT);
-    digitalWrite(led_pin, LOW);
+    pinMode(calibrate_pin, OUTPUT);
+	pinMode(start_pin, OUTPUT);
+    digitalWrite(calibrate_pin, LOW);
+	digitalWrite(start_pin, HIGH);
 
     // Configure jumper pin
     pinMode(read_start, INPUT);
@@ -68,7 +71,8 @@ void setup() {
     delay(5000);
 
     // Display sensor connection on board
-    digitalWrite(led_pin, imu_init);
+    digitalWrite(calibrate_pin, HIGH);
+	digitalWrite(start_pin, LOW);
 }
 
 void loop() {
@@ -90,8 +94,9 @@ void loop() {
                          				   	   : angle_y;
 
     // Determine servo pulse needed from angle
-    int pulse_x = -1.39 * angle_x * 10.8;
-	int pulse_y = -1.39 * angle_y * 10.8;
+    int pulse_x = (angle_x < 0) ? 1.3 * angle_x * 10.8
+								: 1.2 * angle_x * 10.8;
+	int pulse_y = 1.39 * angle_y * 10.8;
 
 	sender.x.transmit(pulse_x);
 	sender.y.transmit(pulse_y);
@@ -103,6 +108,6 @@ void loop() {
 	// Serial.print(imu.getAccelAngle(x)); Serial.print("\t"); Serial.print(imu.getGyroAngle(x)); Serial.print("\t");
 	// Serial.print(imu.getAccelAngle(y)); Serial.print("\t"); Serial.println(imu.getGyroAngle(y));
 
-	Serial.print(imu.getAngle(x)); Serial.print("\t"); Serial.print(imu.getAngle(y)); Serial.print("\t"); Serial.println(imu.getVelocity(x));
+	Serial.print(imu.getAngle(x)); Serial.print("\t"); Serial.print(imu.getAngle(y)); Serial.print("\t"); Serial.println(imu.getVelocity(y));
 }
 
