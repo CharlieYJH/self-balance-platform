@@ -42,8 +42,6 @@ void loop()  {
 	int pulse_y = receiver.y.getData();
 
     // Change servo drive pulse
-	// Serial.print(pulse1); Serial.print("\t");
-	// Serial.println(pulse2);
-	servo.x.writeMicroseconds(pulse_x + 1440);
+	servo.x.writeMicroseconds(pulse_x + 1545);
 	servo.y.writeMicroseconds(pulse_y + 1460);
 }

@@ -94,8 +94,7 @@ void loop() {
                          				   	   : angle_y;
 
     // Determine servo pulse needed from angle
-    int pulse_x = (angle_x < 0) ? 1.3 * angle_x * 10.8
-								: 1.2 * angle_x * 10.8;
+	int pulse_x = 1.39 * angle_x * 10.8;
 	int pulse_y = 1.39 * angle_y * 10.8;
 
 	sender.x.transmit(pulse_x);
@@ -105,9 +104,6 @@ void loop() {
       //Serial.print(millis()); Serial.print("\t"); Serial.print(imu.getVelocity(x)); Serial.print("\t"); Serial.print(imu.getVelocity(y)); Serial.print("\t"); Serial.println(-imu.getAngle(x));
     }
 
-	// Serial.print(imu.getAccelAngle(x)); Serial.print("\t"); Serial.print(imu.getGyroAngle(x)); Serial.print("\t");
-	// Serial.print(imu.getAccelAngle(y)); Serial.print("\t"); Serial.println(imu.getGyroAngle(y));
-
-	Serial.print(imu.getAngle(x)); Serial.print("\t"); Serial.print(imu.getAngle(y)); Serial.print("\t"); Serial.println(imu.getVelocity(y));
+	Serial.print("x-axis: "); Serial.print(imu.getAngle(x)); Serial.print("\t"); Serial.print("y-axis: "); Serial.println(imu.getAngle(y) - 0.7);
 }
 

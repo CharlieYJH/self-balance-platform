@@ -185,8 +185,6 @@ void IMU::update() {
 	float alpha_x = (m_stationary_count[x] > 100) ? 0.995 : m_output_alpha;
 	float alpha_y = (m_stationary_count[y] > 100) ? 0.995 : m_output_alpha;
 
-	Serial.print(alpha_y); Serial.print("\t");
-
     // Update gyroscope angle and fused angle
     m_gyro_angle[x] += m_gyro_data[x] * dt;
     m_gyro_angle[y] += m_gyro_data[y] * dt;
