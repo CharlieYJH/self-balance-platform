@@ -31,7 +31,6 @@ private:
 
 	// Static variable so each sender knows all ACK pins
 	static const uint8_t kMaxReceivers = 2;
-	static ACK_pin m_receivers[kMaxReceivers];
 	static int ACK_count;
 
 	// Data transmission pins for sender Arduino

@@ -25,7 +25,7 @@ DataSenders sender {
 // LED and button pins
 const int calibrate_pin = 24;
 const int start_pin = 25;
-const int read_start = 22;
+const int read_start = 14;
 
 bool broadcasted = false;
 
@@ -45,7 +45,8 @@ void setup() {
 	digitalWrite(start_pin, HIGH);
 
     // Configure jumper pin
-    pinMode(read_start, INPUT);
+    pinMode(read_start, OUTPUT);
+	digitalWrite(read_start, LOW);
   
     // Initialize devices
     bool imu_init = imu.initialize();
@@ -100,10 +101,15 @@ void loop() {
 	sender.x.transmit(pulse_x);
 	sender.y.transmit(pulse_y);
 
-    if (!digitalRead(read_start)) {
-      //Serial.print(millis()); Serial.print("\t"); Serial.print(imu.getVelocity(x)); Serial.print("\t"); Serial.print(imu.getVelocity(y)); Serial.print("\t"); Serial.println(-imu.getAngle(x));
-    }
+	if (!broadcasted) {
+		broadcasted = true;
+		digitalWrite(read_start, HIGH);
+	}
 
-	Serial.print("x-axis: "); Serial.print(imu.getAngle(x)); Serial.print("\t"); Serial.print("y-axis: "); Serial.println(imu.getAngle(y) - 0.7);
+    if (broadcasted) {
+		Serial.print(millis()); Serial.print(" ");
+		Serial.print(imu.getVelocity(x)); Serial.print(" ");
+		Serial.println(imu.getVelocity(y));
+    }
 }
 

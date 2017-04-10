@@ -19,7 +19,7 @@ DataReceiver::DataReceiver(int clk, int ack)
 }
 
 /*
- * receive()
+ * read()
  * Read data from data pins and store it in internal data variable
  */
 void DataReceiver::read() {

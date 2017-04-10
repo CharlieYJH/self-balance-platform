@@ -1,7 +1,6 @@
 #include "DataSender.h"
 
 // Link static variables
-DataSender::ACK_pin DataSender::m_receivers[kMaxReceivers] = {0};
 int DataSender::ACK_count = 0;
 
 /*
@@ -18,10 +17,6 @@ DataSender::DataSender(int clk, int ack)
 	if (ACK_count < kMaxReceivers) {
 
 		m_ack_index = ACK_count;
-
-		// Fill ACK signal array with new ACK signal
-		m_receivers[m_ack_index].pin = ack;
-		m_receivers[m_ack_index].active = true;
 
 		// Set Arduino pin modes
 		pinMode(ack, INPUT);

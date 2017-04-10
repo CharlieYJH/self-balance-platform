@@ -189,9 +189,6 @@ void IMU::update() {
     m_gyro_angle[x] += m_gyro_data[x] * dt;
     m_gyro_angle[y] += m_gyro_data[y] * dt;
 
-	// m_filtered_angle[x] = m_output_alpha * (m_filtered_angle[x] + (1.4 * m_gyro_data[x] * dt)) + (1 - m_output_alpha) * m_accel_angle[x];
-	// m_filtered_angle[y] = m_output_alpha * (m_filtered_angle[y] + (1.4 * m_gyro_data[y] * dt)) + (1 - m_output_alpha) * m_accel_angle[y];
-
 	m_filtered_angle[x] = alpha_x * (m_filtered_angle[x] + (1.4 * m_gyro_data[x] * dt)) + (1 - alpha_x) * m_accel_angle[x];
 	m_filtered_angle[y] = alpha_y * (m_filtered_angle[y] + (1.4 * m_gyro_data[y] * dt)) + (1 - alpha_y) * m_accel_angle[y];
 }
