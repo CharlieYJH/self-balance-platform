@@ -11,15 +11,15 @@
 #endif
 
 struct DataSenders {
-	DataSender x;
-	DataSender y;
+    DataSender x;
+    DataSender y;
 };
 
 // Create objects
 IMU imu(XV4001BD(29), XV4001BD(28), MPU6050(0x68));
 DataSenders sender {
-	DataSender(A11, A14),
-	DataSender(A12, A13)
+    DataSender(A11, A14),
+    DataSender(A12, A13)
 };
 
 // LED and button pins
@@ -40,13 +40,13 @@ void setup() {
 
     // Configure LED
     pinMode(calibrate_pin, OUTPUT);
-	pinMode(start_pin, OUTPUT);
+    pinMode(start_pin, OUTPUT);
     digitalWrite(calibrate_pin, LOW);
-	digitalWrite(start_pin, HIGH);
+    digitalWrite(start_pin, HIGH);
 
     // Configure jumper pin
     pinMode(read_start, OUTPUT);
-	digitalWrite(read_start, LOW);
+    digitalWrite(read_start, LOW);
   
     // Initialize devices
     bool imu_init = imu.initialize();
@@ -73,7 +73,7 @@ void setup() {
 
     // Display sensor connection on board
     digitalWrite(calibrate_pin, HIGH);
-	digitalWrite(start_pin, LOW);
+    digitalWrite(start_pin, LOW);
 }
 
 void loop() {
@@ -81,35 +81,35 @@ void loop() {
     // Update IMU reading
     imu.update();
 
-	// Read angles from sensors
+    // Read angles from sensors
     float angle_x = imu.getAngle(x);
-	float angle_y = imu.getAngle(y);
+    float angle_y = imu.getAngle(y);
 
     // Bound angle within +/-32 degrees
     angle_x = (angle_x > 32) ? 32
-                         	 : (angle_x < -32) ? -32
-                         				   	   : angle_x;
+                             : (angle_x < -32) ? -32
+                                               : angle_x;
 
     angle_y = (angle_y > 32) ? 32
-                         	 : (angle_y < -32) ? -32
-                         				   	   : angle_y;
+                             : (angle_y < -32) ? -32
+                                               : angle_y;
 
     // Determine servo pulse needed from angle
-	int pulse_x = 1.39 * angle_x * 10.8;
-	int pulse_y = 1.39 * angle_y * 10.8;
+    int pulse_x = 1.39 * angle_x * 10.8;
+    int pulse_y = 1.39 * angle_y * 10.8;
 
-	sender.x.transmit(pulse_x);
-	sender.y.transmit(pulse_y);
+    sender.x.transmit(pulse_x);
+    sender.y.transmit(pulse_y);
 
-	if (!broadcasted) {
-		broadcasted = true;
-		digitalWrite(read_start, HIGH);
-	}
+    if (!broadcasted) {
+        broadcasted = true;
+        digitalWrite(read_start, HIGH);
+    }
 
     if (broadcasted) {
-		Serial.print(millis()); Serial.print(" ");
-		Serial.print(imu.getVelocity(x)); Serial.print(" ");
-		Serial.println(imu.getVelocity(y));
+        Serial.print(millis()); Serial.print(" ");
+        Serial.print(imu.getVelocity(x)); Serial.print(" ");
+        Serial.println(imu.getVelocity(y));
     }
 }
 

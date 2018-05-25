@@ -24,7 +24,7 @@ IMU::IMU(XV4001BD gyro_x, XV4001BD gyro_y, MPU6050 accel)
  * @return: initialization status
  */
 bool IMU::initialize() {
- 	return IMU::initializeGyro() && IMU::initializeAccel();
+    return IMU::initializeGyro() && IMU::initializeAccel();
 }
 
 /*
@@ -34,10 +34,10 @@ bool IMU::initialize() {
  */
 bool IMU::initializeGyro() {
 
-	// Initialize gyroscope and return connection test result
-	m_gyro.x.initialize();
+    // Initialize gyroscope and return connection test result
+    m_gyro.x.initialize();
     m_gyro.y.initialize();
-	return m_gyro.x.testConnection() && m_gyro.y.testConnection();
+    return m_gyro.x.testConnection() && m_gyro.y.testConnection();
 }
 
 /*
@@ -47,8 +47,8 @@ bool IMU::initializeGyro() {
  */
 bool IMU::initializeAccel() {
 
-	// join I2C bus (I2Cdev library doesn't do this automatically)
-	#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    // join I2C bus (I2Cdev library doesn't do this automatically)
+    #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
     #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
         Fastwire::setup(400, true);
@@ -159,11 +159,11 @@ void IMU::update() {
     // Make sure time difference will be greater than 2us
     if (now - m_last < 2) return;
 
-	// micros() overflow protection
-	if (now - m_last < 0) {
-		m_last = now;
-		return;
-	}
+    // micros() overflow protection
+    if (now - m_last < 0) {
+        m_last = now;
+        return;
+    }
 
     // Get time difference since last call
     float dt = (now - m_last) / 1000000.0;
@@ -173,24 +173,24 @@ void IMU::update() {
     IMU::updateVelocity();
     IMU::updateAccelAngle();
 
-	// Count how many samples of velocity are less than a threshold
-	// Reset if velocity is greather than this threshold
-	m_stationary_count[x] = (m_gyro_data[x] < 2 && m_gyro_data[x] > -2) ? m_stationary_count[x] + 1
-																		: 0;
+    // Count how many samples of velocity are less than a threshold
+    // Reset if velocity is greather than this threshold
+    m_stationary_count[x] = (m_gyro_data[x] < 2 && m_gyro_data[x] > -2) ? m_stationary_count[x] + 1
+                                                                        : 0;
 
-	m_stationary_count[y] = (m_gyro_data[y] < 2 && m_gyro_data[y] > -2) ? m_stationary_count[y] + 1
-																		: 0;
+    m_stationary_count[y] = (m_gyro_data[y] < 2 && m_gyro_data[y] > -2) ? m_stationary_count[y] + 1
+                                                                        : 0;
 
-	// Set alpha value according to how many velocity samples were stationary
-	float alpha_x = (m_stationary_count[x] > 100) ? 0.995 : m_output_alpha;
-	float alpha_y = (m_stationary_count[y] > 100) ? 0.995 : m_output_alpha;
+    // Set alpha value according to how many velocity samples were stationary
+    float alpha_x = (m_stationary_count[x] > 100) ? 0.995 : m_output_alpha;
+    float alpha_y = (m_stationary_count[y] > 100) ? 0.995 : m_output_alpha;
 
     // Update gyroscope angle and fused angle
     m_gyro_angle[x] += m_gyro_data[x] * dt;
     m_gyro_angle[y] += m_gyro_data[y] * dt;
 
-	m_filtered_angle[x] = alpha_x * (m_filtered_angle[x] + (1.4 * m_gyro_data[x] * dt)) + (1 - alpha_x) * m_accel_angle[x];
-	m_filtered_angle[y] = alpha_y * (m_filtered_angle[y] + (1.4 * m_gyro_data[y] * dt)) + (1 - alpha_y) * m_accel_angle[y];
+    m_filtered_angle[x] = alpha_x * (m_filtered_angle[x] + (1.4 * m_gyro_data[x] * dt)) + (1 - alpha_x) * m_accel_angle[x];
+    m_filtered_angle[y] = alpha_y * (m_filtered_angle[y] + (1.4 * m_gyro_data[y] * dt)) + (1 - alpha_y) * m_accel_angle[y];
 }
 
 /*

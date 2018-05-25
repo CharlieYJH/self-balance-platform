@@ -2,23 +2,23 @@
 #include "DataReceiver.h"
 
 struct DataReceivers {
-	DataReceiver x;
-	DataReceiver y;
+    DataReceiver x;
+    DataReceiver y;
 };
 
 struct Servos {
-	Servo x;
-	Servo y;
+    Servo x;
+    Servo y;
 };
 
 DataReceivers receiver {
-	DataReceiver(13, A3),
-	DataReceiver(0, A4)
+    DataReceiver(13, A3),
+    DataReceiver(0, A4)
 };
 
 Servos servo {
-	Servo(),
-	Servo()
+    Servo(),
+    Servo()
 };
 
 void setup() {
@@ -37,11 +37,11 @@ void setup() {
 void loop()  {
 
     receiver.x.read();
-	receiver.y.read();
+    receiver.y.read();
     int pulse_x = receiver.x.getData();
-	int pulse_y = receiver.y.getData();
+    int pulse_y = receiver.y.getData();
 
     // Change servo drive pulse
-	servo.x.writeMicroseconds(pulse_x + 1545);
-	servo.y.writeMicroseconds(pulse_y + 1460);
+    servo.x.writeMicroseconds(pulse_x + 1545);
+    servo.y.writeMicroseconds(pulse_y + 1460);
 }
